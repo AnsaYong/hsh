@@ -55,16 +55,22 @@ int is_fullpath(char *cmd)
  */
 void get_full_path(cmd_info *cmd)
 {
-	char *path_env, *path, *new_cmd_name;
+	char *path_env, temp_path[MAX_CHARS], *path, *new_cmd_name;
 	size_t cmd_len, path_len;
 	struct stat file_info;
+	char *end = NULL;
 
 	path_env = getenv("PATH");
 	if (path_env == NULL)
 		return;
 
+	strcpy(temp_path, path_env);
+
+	printf("We are tokenizing the following string %s\n", path_env);
+
 	/* tokenize the PATH variable */
-	path = strtok(path_env, ":");
+	path = _strtok(temp_path, ":", &end);
+	printf("The first token is %s\n", path);
 	while (path != NULL)
 	{
 		path_len = strlen(path);
@@ -86,13 +92,12 @@ void get_full_path(cmd_info *cmd)
 		if (stat(new_cmd_name, &file_info) == 0)
 		{
 			/* update the command name and the first argument */
-			/*free(cmd->cmd_name);*/
 			strcat(new_cmd_name, "\0");	/* append '\0' to end of new cmd */
 			cmd->cmd_name = new_cmd_name;
 			cmd->args[0] = new_cmd_name;	/* Update the first argument as well */
-			/*return; *//* Stop after finding the first matching path */
 		}
-
-		path = strtok(NULL, ":");
+		path = _strtok(NULL, ":", &end);
+		free(new_cmd_name);
 	}
+	new_cmd_name = NULL;
 }

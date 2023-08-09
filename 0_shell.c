@@ -59,6 +59,7 @@ void interactive_mode(char *str_prog)
 
 		/* break up commands and arguments into separate words */
 		commands = parse_input(cmd_line);
+		free(cmd_line);
 
 		/* execute commands stored in cmd_info **cmds from cmd_data */
 		for (i = 0; i < commands->numb_cmds; i++)
@@ -82,11 +83,13 @@ void interactive_mode(char *str_prog)
 				}
 			}
 		}
+		free_cmd_info(commands);
+		free(cmd_line);
 	}
 
 	/* free memory */
-	free_cmd_info(commands);
-	free(cmd_line);
+	/* free_cmd_info(commands);*/
+	/* free(cmd_line);*/
 
 	/* exit with status */
 	if (status >= 0)
