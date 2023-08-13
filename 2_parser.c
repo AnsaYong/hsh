@@ -19,14 +19,29 @@ void parse_cmd(char *user_input, cmd_info *cmd)
 
 	/* Now, extract the arguments */
 	cmd->args = NULL;
+
 	while (token != NULL)
 	{
-		cmd->args = realloc(cmd->args, (arg_count + 1) * sizeof(char *));
+		cmd->args = realloc(cmd->args, (arg_count + 2) * sizeof(char *));
+
+		if (cmd->args == NULL)
+		{
+			perror("realloc");
+		}
+
 		cmd->args[arg_count] = strdup(token);
+
+		if (cmd->args[arg_count] == NULL)
+		{
+			perror("args error");
+		}
+
 		arg_count++;
 		token = strtok(NULL, " ");
 	}
+
 	cmd->numb_args = arg_count;
+	cmd->args[arg_count] = NULL;  /* Null-terminate the array */
 }
 
 /* Break up multiple commands separated by the given separator, then call parse_cmd to tokenize the commands separately */

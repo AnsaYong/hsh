@@ -34,8 +34,8 @@ int main(int argc, char *argv[], char *envp[])
 }
 
 /**
- * interactive_mode - executes interactive commands
- * @str_prog: a tsring representing the program name
+ * interactive_mode - executes commands in interactive mode
+ * @str_prog: a string representing the program name
  */
 void interactive_mode(char *str_prog)
 {
@@ -88,8 +88,8 @@ void interactive_mode(char *str_prog)
 	}
 
 	/* free memory */
-	/* free_cmd_info(commands);*/
-	/* free(cmd_line);*/
+	/*free_cmd_info(commands);*/
+	/*free(cmd_line);*/
 
 	/* exit with status */
 	if (status >= 0)
@@ -99,12 +99,12 @@ void interactive_mode(char *str_prog)
 }
 
 /**
- * non-interactive_mode - executes commands without printing prompt
+ * non-interactive_mode - executes commands in non interactive mode
  * @str_prog: a string representing the program name
  */
 void non_interactive_mode(char *str_prog)
 {
-	char *cmd_line;
+	char *cmd_line, *fullpath = NULL;
 	int status = -1, i;
 	cmd_data *commands;
 	builtin_function builtin_ptr = NULL;
@@ -113,17 +113,15 @@ void non_interactive_mode(char *str_prog)
 
 	while (status == -1)
 	{
-		/*cmd_data *commands;*/
-		/*builtin_function builtin_ptr = NULL;*/
-
-		/* read and store user commands from stdin */
-		cmd_line = read_cmd_line();
+		cmd_line = read_cmd_line();	/* get user command from stdin */
+		if (cmd_line != NULL && is_all_spaces(cmd_line))
+		{
+			free(cmd_line);
+			status = 0;
+		}
 
 		printf("You entered the following command: %s\n", cmd_line);
-		printf("Execute before you continue\n");
-
-		/* break up commands and arguments into separate words */
-		commands = parse_input(cmd_line);
+		commands = parse_input(cmd_line); /* breakup cmd_line into cmds+args */
 		print_cmd_info(commands);
 
 		/* execute all commands stored in cmd_info **cmds from cmd_data */
@@ -135,29 +133,43 @@ void non_interactive_mode(char *str_prog)
 			else
 			{
 				printf("Not a builtin command\n");
-				printf("Checking %s for fullpath\n", commands->cmds[i]->cmd_name);
+				printf("Checking the command for fullpath\n");
 				if (!(is_fullpath(commands->cmds[i]->cmd_name)))
 				{
-					printf("Command does not have full path\n");
-					get_full_path(commands->cmds[i]);
+					printf("Command is %s and does not have full path\n", commands->cmds[i]->cmd_name);
+					fullpath = get_full_path(commands->cmds[i]);
+					if (fullpath == NULL)
+					{
+						perror("cmd does not exist");
+						free_cmd_info(commands);
+						free(cmd_line);
+						status = 127;
+						break;
+					}
+
+					/* free, then update old cmd_name ptr with new full path */
+					free(commands->cmds[i]->cmd_name);
+					commands->cmds[i]->cmd_name = fullpath;
+
+					/* free, then update first argument in args array */
+					free(commands->cmds[i]->args[0]);
+					commands->cmds[i]->args[0] = strdup(fullpath);
+
+					printf("The updated command is:\n");
 					print_cmd_info(commands);
 					status = execute_command(commands->cmds[i]);
 				}
 				else
 				{
-					printf("Full path is given\n");
+					printf("Command is %s and full path is given\n", commands->cmds[i]->cmd_name);
 					status = execute_command(commands->cmds[i]);
 				}
+
 			}
+			free_cmd_info(commands);
+			free(cmd_line);
 		}
 	}
-
-	/* free memory */
-	free_cmd_info(commands);
-	free(cmd_line);
-	/* exit with status */
 	if (status >= 0)
-	{
 		exit(status);
-	}
 }

@@ -34,8 +34,8 @@ int execute_command(cmd_info *command)
 }
 
 /**
- * is_fullpath - checks if the command is a full path
- * @command: the provided user command
+ * is_fullpath - checks if the command has a full path
+ * @cmd: the user provided command
  *
  * Return: 1 if full path is given, and 0 otherwise
  */
@@ -52,8 +52,10 @@ int is_fullpath(char *cmd)
 /**
  * get_full_path - appends full path to the command name if it is not given
  * @cmd: command to be executed
+ *
+ * Return: command name with full path on success, NULL otherwise
  */
-void get_full_path(cmd_info *cmd)
+char *get_full_path(cmd_info *cmd)
 {
 	char *path_env, temp_path[MAX_CHARS], *path, *new_cmd_name;
 	size_t cmd_len, path_len;
@@ -62,42 +64,34 @@ void get_full_path(cmd_info *cmd)
 
 	path_env = getenv("PATH");
 	if (path_env == NULL)
-		return;
+		return (NULL);
+	strcpy(temp_path, path_env);	/* duplicate path before it is changed */
 
-	strcpy(temp_path, path_env);
-
-	printf("We are tokenizing the following string %s\n", path_env);
-
-	/* tokenize the PATH variable */
-	path = _strtok(temp_path, ":", &end);
-	printf("The first token is %s\n", path);
+	path = _strtok(temp_path, ":", &end);	/* first directory from PATH var */
 	while (path != NULL)
 	{
 		path_len = strlen(path);
 		cmd_len = strlen(cmd->cmd_name);
 
-		/* allocate memory for the concatenated command name */
-		new_cmd_name = malloc(path_len + cmd_len + 2);
+		new_cmd_name = malloc(path_len + cmd_len + 2);	/* stores current path */
 		if (new_cmd_name == NULL)
-		{
-			perror("malloc");
-			return;
-		}
+			return (NULL);
+
 		/* construct the full path to the command */
 		strcpy(new_cmd_name, path);
 		strcat(new_cmd_name, "/");
 		strcat(new_cmd_name, cmd->cmd_name);
 
-		/* check if the new path exists using stat */
+		/* check if the new path / command exists using stat */
 		if (stat(new_cmd_name, &file_info) == 0)
 		{
-			/* update the command name and the first argument */
-			strcat(new_cmd_name, "\0");	/* append '\0' to end of new cmd */
-			cmd->cmd_name = new_cmd_name;
-			cmd->args[0] = new_cmd_name;	/* Update the first argument as well */
+			/* command exists */
+			strcat(new_cmd_name, "\0");	/* Append '\0' to end new cmd name */
+			return (new_cmd_name);
 		}
-		path = _strtok(NULL, ":", &end);
-		free(new_cmd_name);
+		/* else current path is not the right path */
+		free(new_cmd_name);	/* free the memory that is not returned */
+		path = _strtok(NULL, ":", &end);	/* continue searching */
 	}
-	new_cmd_name = NULL;
+	return (NULL);
 }

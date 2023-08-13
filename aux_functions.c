@@ -76,3 +76,23 @@ void strip_white_spaces(char **args_arr, int numb_args)
 		}
 	}
 }
+
+/**
+ * is_all_spaces - checks if the command line only has spaces
+ * @line: pointer to user command / command line
+ *
+ * Return: 1 if command line only has spaces, 0 otherwise
+ */
+int is_all_spaces(const char *line)
+{
+	while (*line)
+	{
+		if (*line != ' ' && *line != '\n' && *line != '\t')
+		{
+			return (0);
+		}
+		line++;
+	}
+
+	return (1);
+}

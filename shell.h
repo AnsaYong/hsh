@@ -81,10 +81,11 @@ void free_cmd_info(cmd_data *parsed_cmds);
 /* 3_executor.c */
 int execute_command(cmd_info *command);
 int is_fullpath(char *cmd);
-void get_full_path(cmd_info *cmd);
+char *get_full_path(cmd_info *cmd);
 /* aux_functions.c */
 char *_strtok(char *str, const char *sep, char **end);
 void strip_white_spaces(char **args_arr, int numb_args);
+int is_all_spaces(const char *line);
 /* builtin_functions.c */
 cmd_info *(*is_builtin_command(cmd_info *command))(cmd_info *);
 /* builtin_functions2.c */
