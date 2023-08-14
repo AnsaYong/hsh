@@ -35,16 +35,16 @@ int main(int argc, char *argv[], char *envp[])
 
 /**
  * interactive_mode - executes commands in interactive mode
- * @str_prog: a string representing the program name
+ * @prog: a string representing the program name
  */
-void interactive_mode(char *str_prog)
+void interactive_mode(char *prog)
 {
 	char *cmd_line;
 	int status = -1, i;
 	cmd_data *commands;
 	/*builtin_function builtin_ptr = NULL;*/
 
-	(void)str_prog;
+	(void)prog;
 
 	/* print prompt */
 	while (status == -1)
@@ -100,16 +100,14 @@ void interactive_mode(char *str_prog)
 
 /**
  * non-interactive_mode - executes commands in non interactive mode
- * @str_prog: a string representing the program name
+ * @prog: a string representing the program name
  */
-void non_interactive_mode(char *str_prog)
+void non_interactive_mode(char *prog)
 {
 	char *cmd_line, *fullpath = NULL;
 	int status = -1, i;
 	cmd_data *commands;
 	builtin_function builtin_ptr = NULL;
-
-	(void)str_prog;
 
 	while (status == -1)
 	{
@@ -118,6 +116,7 @@ void non_interactive_mode(char *str_prog)
 		{
 			free(cmd_line);
 			status = 0;
+			break;
 		}
 
 		printf("You entered the following command: %s\n", cmd_line);
@@ -129,7 +128,10 @@ void non_interactive_mode(char *str_prog)
 		{
 			printf("The current command is %s\n", commands->cmds[i]->cmd_name);
 			if((builtin_ptr = is_builtin_command(commands->cmds[i])) != NULL)
+			{
+				printf("Executing builtin command\n");
 				builtin_ptr(commands->cmds[i]);	/* use (*builtin_ptr)(...) */
+			}
 			else
 			{
 				printf("Not a builtin command\n");
@@ -140,11 +142,10 @@ void non_interactive_mode(char *str_prog)
 					fullpath = get_full_path(commands->cmds[i]);
 					if (fullpath == NULL)
 					{
-						perror("cmd does not exist");
+						command_not_found(prog, commands->cmds[i]->cmd_name);
 						free_cmd_info(commands);
 						free(cmd_line);
-						status = 127;
-						break;
+						exit(127);
 					}
 
 					/* free, then update old cmd_name ptr with new full path */

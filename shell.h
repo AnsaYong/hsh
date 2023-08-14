@@ -67,8 +67,8 @@ typedef struct builtin_func
 /*---PROTOTYPES---*/
 
 /* 0_shell.c */
-void interactive_mode(char *str_prog);
-void non_interactive_mode(char *str_prog);
+void interactive_mode(char *prog);
+void non_interactive_mode(char *prog);
 /* 1_read_commands.c */
 char *read_cmd_line(void);
 /* 2_parser.c */
@@ -94,5 +94,7 @@ cmd_info *execute_env(cmd_info *command);
 cmd_info *execute_cd(cmd_info *command);
 cmd_info *execute_setenv(cmd_info *command);
 cmd_info *execute_unsetenv(cmd_info *command);
+/* error_messages.c */
+void command_not_found(char *prog, char *command);
 
 #endif /* SHELL_H */
