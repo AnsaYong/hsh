@@ -96,3 +96,53 @@ int is_all_spaces(const char *line)
 
 	return (1);
 }
+
+/**
+ * _getline - reads user commands
+ * @buffer: stores the user's input
+ *
+ * Return: number of characters read
+ */
+ssize_t _getline(char **buffer)
+{
+	static char func_buff[MAX_CHARS];
+	size_t pos = 0, chars_read = 0, cmd_size = 0, buff_size = 0;
+	char current_char;
+	int line_complete = 0;
+	*buffer = NULL;
+
+	while (!line_complete)
+	{
+		if (pos >= chars_read)  /* check if more data needs to be read */
+		{
+			chars_read = read(STDIN_FILENO, func_buff, MAX_CHARS);
+			if (chars_read <= 0)    /* end of input or an error occurred */
+			{
+				if (cmd_size == 0)      /* No characters read, return chars_read */
+					return (chars_read);
+				line_complete = 1;      /* Partial line read, indicate completion */
+			}
+
+			pos = 0;
+		}
+		current_char = func_buff[pos++];
+
+		if (cmd_size >= buff_size)      /* check if buffer needs to be resized */
+		{
+			buff_size = (buff_size == 0) ? MAX_CHARS : buff_size * 2;
+			*buffer = malloc(buff_size);
+			if (*buffer == NULL)
+			{
+				perror("Memory allocation failed");
+				exit(EXIT_FAILURE);
+			}
+		}
+		(*buffer)[cmd_size++] = current_char;   /* Append the current char */
+		if (current_char == '\0')       /* check if we reached end of the string */
+		{
+			line_complete = 1;
+			(*buffer)[cmd_size - 1] = '\0';
+		}
+	}
+	return (cmd_size - 1);  /* Exclude the null-terminator */
+}

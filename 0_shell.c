@@ -164,13 +164,14 @@ void non_interactive_mode(char *prog)
 				{
 					printf("Command is %s and full path is given\n", commands->cmds[i]->cmd_name);
 					status = execute_command(commands->cmds[i]);
+					printf("The command status is %d\n", status);
 				}
-
 			}
-			free_cmd_info(commands);
-			free(cmd_line);
 		}
+		free_cmd_info(commands);
+		free(cmd_line);
 	}
+
 	if (status >= 0)
 		exit(status);
 }

@@ -86,6 +86,7 @@ char *get_full_path(cmd_info *cmd);
 char *_strtok(char *str, const char *sep, char **end);
 void strip_white_spaces(char **args_arr, int numb_args);
 int is_all_spaces(const char *line);
+ssize_t _getline(char **buffer);
 /* builtin_functions.c */
 cmd_info *(*is_builtin_command(cmd_info *command))(cmd_info *);
 /* builtin_functions2.c */
@@ -96,5 +97,6 @@ cmd_info *execute_setenv(cmd_info *command);
 cmd_info *execute_unsetenv(cmd_info *command);
 /* error_messages.c */
 void command_not_found(char *prog, char *command);
+void invalid_exit_arg(char *arg);
 
 #endif /* SHELL_H */

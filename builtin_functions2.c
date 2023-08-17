@@ -12,11 +12,18 @@ cmd_info *execute_exit(cmd_info *command)
 
 	if (command->numb_args == 1)
 	{
+		/*free_cmd_info(command);*/
 		exit(EXIT_SUCCESS);
 	}
 	else if (command->numb_args == 2)
 	{
 		status = atoi(command->args[1]);
+		if (status < 0)
+		{
+			invalid_exit_arg(command->args[1]);
+			exit(2);
+		}
+		/*free_cmd_info(command);*/
 		exit(status);
 	}
 	else
@@ -57,8 +64,9 @@ cmd_info *execute_env(cmd_info *command)
  */
 cmd_info *execute_cd(cmd_info *command)
 {
-	if (command->numb_args == 1)
+	if (command->numb_args == 2)
 	{
+		printf("The argument (folder name) is %s\n", command->args[1]);
 		if (chdir(command->args[1]) == -1)
 		{
 			perror("cd");

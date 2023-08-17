@@ -16,9 +16,28 @@ void command_not_found(char *prog, char *command)
 	cmd_len = strlen(command);
 
 	/* print error message to stdout */
-	write(1, prog, prog_len);
-	write(1, mid, 5);
-	write(1, command, cmd_len);
-	write(1, end, 12);
+	write(STDERR_FILENO, prog, prog_len);
+	write(STDERR_FILENO, mid, 5);
+	write(STDERR_FILENO, command, cmd_len);
+	write(STDERR_FILENO, end, 12);
 
+}
+
+/**
+ * invalid_exit_arg - prints a message if the argument for exit is negative
+ * @arg: arg provided to exit
+ */
+void invalid_exit_arg(char *arg)
+{
+	int arg_len;
+
+	arg_len = strlen(arg);
+
+	/* print error message to stdout */
+	write(STDERR_FILENO, "./hsh", 5);
+	write(STDERR_FILENO, ": 1: ", 5);
+	write(STDERR_FILENO, "exit", 4);
+	write(STDERR_FILENO, ": Illegal number: ", 18);
+	write(STDERR_FILENO, arg, arg_len);
+	write(STDERR_FILENO, "\n", 1);
 }

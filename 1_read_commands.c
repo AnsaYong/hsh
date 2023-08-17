@@ -13,6 +13,7 @@ char *read_cmd_line(void)
 	ssize_t chars_read;
 
 	chars_read = getline(&buffer, &buffer_size, stdin);
+	/*chars_read = _getline(&buffer);*/
 
 	if (chars_read == -1)
 	{

@@ -14,19 +14,23 @@ int execute_command(cmd_info *command)
 	child_pid = fork();
 	if (child_pid == -1)
 	{
+		printf("pid is -1");
 		perror("./hsh");
 	}
 	else if	(child_pid == 0)
 	{
+		printf("pid is 0 - so executing\n");
 		/* remember to add the environment parameter */
 		if (execve(command->cmd_name, command->args, NULL) < 0)
 		{
+			printf("execve returns a negative number\n");
 			perror("./hsh");
 		}
 		exit(EXIT_FAILURE);
 	}
 	else
 	{
+		printf("waiting for child process to terminate\n");
 		/* wait for the child to terminate */
 		wait(&status);
 	}
@@ -42,10 +46,12 @@ int execute_command(cmd_info *command)
 int is_fullpath(char *cmd)
 {
 	/* check of the first word starts with a '/' */
-	if (cmd[0] == '/')
+	if ((cmd[0] == '/') | (cmd[0] == '.'))
 	{
+		printf("The first char is / or .\n");
 		return (1);
 	}
+	printf("Returning 0\n");
 	return (0);
 }
 
