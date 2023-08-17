@@ -6,10 +6,11 @@
  *
  * Return: -1 on success, 0 otherwise
  */
-int execute_command(cmd_info *command)
+int execute_command(cmd_info *command, int *c_status)
 {
 	pid_t child_pid;
 	int status;
+	int err_check, cmd_status;
 
 	child_pid = fork();
 	if (child_pid == -1)
@@ -21,7 +22,9 @@ int execute_command(cmd_info *command)
 	{
 		printf("pid is 0 - so executing\n");
 		/* remember to add the environment parameter */
-		if (execve(command->cmd_name, command->args, NULL) < 0)
+		err_check = execve(command->cmd_name, command->args, NULL);
+		printf("The error code is: %d\n", err_check);
+		if (err_check < 0)
 		{
 			printf("execve returns a negative number\n");
 			perror("./hsh");
@@ -33,6 +36,13 @@ int execute_command(cmd_info *command)
 		printf("waiting for child process to terminate\n");
 		/* wait for the child to terminate */
 		wait(&status);
+
+		if (WIFEXITED(status))
+		{
+			cmd_status = WEXITSTATUS(status);
+			printf("cmd_status: %d\n", cmd_status);
+			*c_status = cmd_status;
+		}
 	}
 	return (-1);
 }

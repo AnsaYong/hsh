@@ -71,6 +71,7 @@ void interactive_mode(char *prog);
 void non_interactive_mode(char *prog);
 /* 1_read_commands.c */
 char *read_cmd_line(void);
+ssize_t _getline(char **buffer);
 /* 2_parser.c */
 void init_info(cmd_data *parsed_commands);
 void parse_cmd(char *user_input, cmd_info *cmd);
@@ -79,17 +80,15 @@ cmd_data *parse_input(char *cmd_line);
 void print_cmd_info(cmd_data *parsed_cmds);
 void free_cmd_info(cmd_data *parsed_cmds);
 /* 3_executor.c */
-int execute_command(cmd_info *command);
+int execute_command(cmd_info *command, int *c_status);
 int is_fullpath(char *cmd);
 char *get_full_path(cmd_info *cmd);
 /* aux_functions.c */
 char *_strtok(char *str, const char *sep, char **end);
 void strip_white_spaces(char **args_arr, int numb_args);
 int is_all_spaces(const char *line);
-ssize_t _getline(char **buffer);
-/* builtin_functions.c */
 cmd_info *(*is_builtin_command(cmd_info *command))(cmd_info *);
-/* builtin_functions2.c */
+/* 4_builtin_functions.c */
 cmd_info *execute_exit(cmd_info *command);
 cmd_info *execute_env(cmd_info *command);
 cmd_info *execute_cd(cmd_info *command);
@@ -98,5 +97,8 @@ cmd_info *execute_unsetenv(cmd_info *command);
 /* error_messages.c */
 void command_not_found(char *prog, char *command);
 void invalid_exit_arg(char *arg);
+/* string_functions.c */
+char *_strdup(char *str);
+int _strlen(char *str);
 
 #endif /* SHELL_H */

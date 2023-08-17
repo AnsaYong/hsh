@@ -40,7 +40,7 @@ int main(int argc, char *argv[], char *envp[])
 void interactive_mode(char *prog)
 {
 	char *cmd_line;
-	int status = -1, i;
+	int status = -1, i, cmd_status;
 	cmd_data *commands;
 	/*builtin_function builtin_ptr = NULL;*/
 
@@ -75,11 +75,11 @@ void interactive_mode(char *prog)
 					get_full_path(commands->cmds[i]);
 					printf("The updated command is %s\n", commands->cmds[i]->cmd_name);
 					print_cmd_info(commands);
-					status = execute_command(commands->cmds[i]);
+					status = execute_command(commands->cmds[i], &cmd_status);
 				}
 				else
 				{
-					status = execute_command(commands->cmds[i]);
+					status = execute_command(commands->cmds[i], &cmd_status);
 				}
 			}
 		}
@@ -105,7 +105,7 @@ void interactive_mode(char *prog)
 void non_interactive_mode(char *prog)
 {
 	char *cmd_line, *fullpath = NULL;
-	int status = -1, i;
+	int status = -1, i, cmd_status = 0;
 	cmd_data *commands;
 	builtin_function builtin_ptr = NULL;
 
@@ -115,8 +115,7 @@ void non_interactive_mode(char *prog)
 		if (cmd_line != NULL && is_all_spaces(cmd_line))
 		{
 			free(cmd_line);
-			status = 0;
-			break;
+			continue;
 		}
 
 		printf("You entered the following command: %s\n", cmd_line);
@@ -158,13 +157,15 @@ void non_interactive_mode(char *prog)
 
 					printf("The updated command is:\n");
 					print_cmd_info(commands);
-					status = execute_command(commands->cmds[i]);
+					status = execute_command(commands->cmds[i], &cmd_status);
 				}
 				else
 				{
 					printf("Command is %s and full path is given\n", commands->cmds[i]->cmd_name);
-					status = execute_command(commands->cmds[i]);
-					printf("The command status is %d\n", status);
+					status = execute_command(commands->cmds[i], &cmd_status);
+					printf("The command status is %d\n", cmd_status);
+					if (cmd_status)
+						exit(cmd_status);
 				}
 			}
 		}
