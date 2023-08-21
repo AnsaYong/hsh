@@ -55,7 +55,7 @@ int execute_command(cmd_info *command, int *c_status)
  */
 int is_fullpath(char *cmd)
 {
-	/* check of the first word starts with a '/' */
+	/* check of the first word starts with a '/' or '.' */
 	if ((cmd[0] == '/') | (cmd[0] == '.'))
 	{
 		printf("The first char is / or .\n");
@@ -81,28 +81,28 @@ char *get_full_path(cmd_info *cmd)
 	path_env = getenv("PATH");
 	if (path_env == NULL)
 		return (NULL);
-	strcpy(temp_path, path_env);	/* duplicate path before it is changed */
+	_strcpy(temp_path, path_env);	/* duplicate path before it is changed */
 
 	path = _strtok(temp_path, ":", &end);	/* first directory from PATH var */
 	while (path != NULL)
 	{
-		path_len = strlen(path);
-		cmd_len = strlen(cmd->cmd_name);
+		path_len = _strlen(path);
+		cmd_len = _strlen(cmd->cmd_name);
 
 		new_cmd_name = malloc(path_len + cmd_len + 2);	/* stores current path */
 		if (new_cmd_name == NULL)
 			return (NULL);
 
 		/* construct the full path to the command */
-		strcpy(new_cmd_name, path);
-		strcat(new_cmd_name, "/");
-		strcat(new_cmd_name, cmd->cmd_name);
+		_strcpy(new_cmd_name, path);
+		_strcat(new_cmd_name, "/");
+		_strcat(new_cmd_name, cmd->cmd_name);
 
 		/* check if the new path / command exists using stat */
 		if (stat(new_cmd_name, &file_info) == 0)
 		{
 			/* command exists */
-			strcat(new_cmd_name, "\0");	/* Append '\0' to end new cmd name */
+			_strcat(new_cmd_name, "\0");	/* Append '\0' to end new cmd name */
 			return (new_cmd_name);
 		}
 		/* else current path is not the right path */

@@ -153,7 +153,7 @@ void non_interactive_mode(char *prog)
 
 					/* free, then update first argument in args array */
 					free(commands->cmds[i]->args[0]);
-					commands->cmds[i]->args[0] = strdup(fullpath);
+					commands->cmds[i]->args[0] = _strdup(fullpath);
 
 					printf("The updated command is:\n");
 					print_cmd_info(commands);

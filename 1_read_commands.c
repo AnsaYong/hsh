@@ -39,7 +39,7 @@ char *read_cmd_line(void)
  *
  * Return: number of characters read
  */
-ssize_t _getline(char **buffer)
+ssize_t __getline(char **buffer)
 {
 	static char func_buff[MAX_CHARS];
 	size_t pos = 0, chars_read = 0, cmd_size = 0, buff_size = 0;

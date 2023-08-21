@@ -71,7 +71,7 @@ void interactive_mode(char *prog);
 void non_interactive_mode(char *prog);
 /* 1_read_commands.c */
 char *read_cmd_line(void);
-ssize_t _getline(char **buffer);
+ssize_t __getline(char **buffer);
 /* 2_parser.c */
 void init_info(cmd_data *parsed_commands);
 void parse_cmd(char *user_input, cmd_info *cmd);
@@ -100,5 +100,20 @@ void invalid_exit_arg(char *arg);
 /* string_functions.c */
 char *_strdup(char *str);
 int _strlen(char *str);
+void _strcat(char *dest, char *src);
+char *_strchr(const char *s, const char c);
+int _atoi(const char *str);
+/* string_functions2.c */
+int _strcmp(char *str1, char *str2);
+char *_strcpy(char *destination, const char *source);
+int compare(const char *main_str, const char *search_str);
+const char *_strstr(const char *main_str, const char *search_str);
+
+/* additional_functions.c */
+void *_realloc(void *old_ad, size_t old_size, size_t new_size);
+int _getline(char **lineptr, size_t *n, FILE *stream);
+
+
+
 
 #endif /* SHELL_H */

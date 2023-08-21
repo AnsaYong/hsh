@@ -17,14 +17,14 @@ char *_strtok(char *str, const char *sep, char **end)
 		*end = str;
 
 	/* skip leading delimiters */
-	while (**end != '\0' && strchr(sep, **end) != NULL)
+	while (**end != '\0' && _strchr(sep, **end) != NULL)
 		(*end)++;
 
 	if (**end == '\0')
 		return (NULL);
 
 	token_start = *end;
-	while (**end != '\0' && strchr(sep, **end) == NULL)
+	while (**end != '\0' && _strchr(sep, **end) == NULL)
 		(*end)++;
 
 	if (**end != '\0')
@@ -43,7 +43,7 @@ void strip_white_spaces(char **args_arr, int numb_args)
 	int i, j = 0, k;
 	char *str = NULL;
 	char last_char = ' ';
-	int len = strlen(str);
+	int len = _strlen(str);
 
 	for (k = 0; k < numb_args; k++)
 	{
@@ -117,7 +117,7 @@ cmd_info *(*is_builtin_command(cmd_info *command))(cmd_info *)
 
 	for (i = 0; builtins[i].cmd_name != NULL; i++)
 	{
-		if (strcmp(command->cmd_name, builtins[i].cmd_name) == 0)
+		if (_strcmp(command->cmd_name, builtins[i].cmd_name) == 0)
 		{
 			return (builtins[i].func_ptr);
 		}

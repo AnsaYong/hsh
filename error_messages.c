@@ -12,8 +12,8 @@ void command_not_found(char *prog, char *command)
 	char *mid = ": 1: ";
 	char *end = ": not found\n";
 
-	prog_len = strlen(prog);
-	cmd_len = strlen(command);
+	prog_len = _strlen(prog);
+	cmd_len = _strlen(command);
 
 	/* print error message to stdout */
 	write(STDERR_FILENO, prog, prog_len);
@@ -31,7 +31,7 @@ void invalid_exit_arg(char *arg)
 {
 	int arg_len;
 
-	arg_len = strlen(arg);
+	arg_len = _strlen(arg);
 
 	/* print error message to stdout */
 	write(STDERR_FILENO, "./hsh", 5);

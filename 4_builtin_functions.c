@@ -17,7 +17,7 @@ cmd_info *execute_exit(cmd_info *command)
 	}
 	else if (command->numb_args == 2)
 	{
-		status = atoi(command->args[1]);
+		status = _atoi(command->args[1]);
 		if (status < 0)
 		{
 			invalid_exit_arg(command->args[1]);
@@ -49,7 +49,7 @@ cmd_info *execute_env(cmd_info *command)
 
 	while (*env)
 	{
-		write(STDOUT_FILENO, *env, strlen(*env));
+		write(STDOUT_FILENO, *env, _strlen(*env));
 		write(STDOUT_FILENO, "\n", 1);
 		env++;
 	}

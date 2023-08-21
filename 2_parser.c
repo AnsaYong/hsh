@@ -15,7 +15,7 @@ void parse_cmd(char *user_input, cmd_info *cmd)
 
 	/* First, extract the command name */
 	token = strtok(user_input, " ");
-	cmd->cmd_name = strdup(token);
+	cmd->cmd_name = _strdup(token);
 
 	/* Now, extract the arguments */
 	cmd->args = NULL;
@@ -29,7 +29,7 @@ void parse_cmd(char *user_input, cmd_info *cmd)
 			perror("realloc");
 		}
 
-		cmd->args[arg_count] = strdup(token);
+		cmd->args[arg_count] = _strdup(token);
 
 		if (cmd->args[arg_count] == NULL)
 		{
@@ -52,7 +52,7 @@ void handle_separator(char *cmd_line, cmd_data *input, const char *separator)
 	char *end = NULL;
 
 	/* Duplicate the input cmdline, as strtok will modify the string */
-	/*cmd_line_copy = strdup(cmd_line);*/
+	/*cmd_line_copy = _strdup(cmd_line);*/
 	printf("The separator is %s\n", separator);
 
 	token = _strtok(cmd_line, separator, &end);
@@ -84,7 +84,7 @@ cmd_data *parse_input(char *cmd_line)
 	init_info(parsed_cmds);
 
 	/* Look for specific separators in the user input */
-	if (!strstr(cmd_line, "&&") && !strstr(cmd_line, "||") && !strstr(cmd_line, ";"))
+	if (!_strstr(cmd_line, "&&") && !_strstr(cmd_line, "||") && !_strstr(cmd_line, ";"))
 	{
 		/* If no separator is found, treat the entire input as a single command */
 		parsed_cmds->cmds = realloc(parsed_cmds->cmds, (parsed_cmds->numb_cmds + 1) * sizeof(cmd_info *));
@@ -98,12 +98,12 @@ cmd_data *parse_input(char *cmd_line)
 	{
 		/* Handle different separators */
 		/* For each command in cmd_line, call parse_cmd() and store the result in cmd_data */
-		if (strstr(cmd_line, "&&"))
+		if (_strstr(cmd_line, "&&"))
 		{
 			handle_separator(cmd_line, parsed_cmds, "&&");
 			printf("There are %d commands, separated by &&\n", parsed_cmds->numb_cmds);
 		}
-		else if (strstr(cmd_line, "||"))
+		else if (_strstr(cmd_line, "||"))
 		{
 			handle_separator(cmd_line, parsed_cmds, "||");
 			printf("There are multiple commands, separated by ||\n");
