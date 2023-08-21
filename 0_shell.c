@@ -87,7 +87,6 @@ void non_interactive_mode(char *prog)
 	{
 		/* get user command from stdin */
 		cmd_line = read_cmd_line();
-		printf("The command is: %s\n", cmd_line);
 		if (cmd_line != NULL && is_all_spaces(cmd_line))
 		{
 			free(cmd_line);

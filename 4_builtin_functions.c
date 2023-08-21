@@ -64,12 +64,38 @@ cmd_info *execute_env(cmd_info *command)
  */
 cmd_info *execute_cd(cmd_info *command)
 {
+	char *home = getenv("HOME");
+	char *previous_dir = getenv("OLDPWD");
+
 	if (command->numb_args == 2)
 	{
-		if (chdir(command->args[1]) == -1)
+		/* handle cd - */
+		if (_strcmp(command->args[1], "-") == 0)
 		{
-			perror("cd");
+			if (previous_dir != NULL)
+			{
+				write(STDOUT_FILENO, previous_dir, _strlen(previous_dir));
+				write(STDOUT_FILENO, "\n", 1);
+				chdir(previous_dir);
+			}
+			else
+			{
+				perror("OLDPWD");
+			}
 		}
+		/* handle cd [directory] */
+		else
+		{
+			if (chdir(command->args[1]) == -1)
+			{
+				perror("cd");
+			}
+		}
+	}
+	/* handle no arguments to cd */
+	else if (command->numb_args == 1)
+	{
+		chdir(home);
 	}
 	else
 	{
