@@ -20,12 +20,14 @@ extern char **environ;
 
 /* 2_parser.c */
 /**
- * command_info - store information about a single command, after tokenizing
- * the user input and breaking up commands at separators
+ * struct command_info - store information about a single command
  * @cmd_name: A string (char pointer) representing the command name
  * @numb_args: An integer representing the number of arguments for the command
  * @args: A pointer to an array of strings (char pointers) to store the
  * arguments for the command.
+ *
+ * Description: store information about a single command, after tokenizing
+ * the user input and breaking up commands at separators
  */
 typedef struct command_info
 {
@@ -35,7 +37,7 @@ typedef struct command_info
 } cmd_info;
 
 /**
- * command_structure - represents information obtained from the user input
+ * struct command_structure - represents information from the user input
  * @numb_cmds: an int representing the number of commands provided by the user
  * @cmds: A pointer to an array of pointers to cmd_info structs. This allows
  * you to store information about each individual command.
@@ -46,16 +48,13 @@ typedef struct command_structure
 	cmd_info **cmds;
 } cmd_data;
 
-/* builtin_func - returns pointer to the matched builtin function
- * @str: command to compare against predefined builtin functions
- * @f: function associated
- *
- * Return: pointer to the builtin function
- */
-
-/* builtin_functions.c */
-
 typedef cmd_info *(*builtin_function)(cmd_info *);
+
+/**
+ * struct builtin_func - returns pointer to the matched builtin function
+ * @cmd_name: command to compare against predefined builtin functions
+ * @func_ptr: the associated function
+ */
 
 typedef struct builtin_func
 {
@@ -69,9 +68,10 @@ typedef struct builtin_func
 /* 0_shell.c */
 void interactive_mode(char *prog);
 void non_interactive_mode(char *prog);
+int process_commands(cmd_data *commands, char *prog);
 /* 1_read_commands.c */
 char *read_cmd_line(void);
-ssize_t __getline(char **buffer);
+ssize_t _getline(char **lineptr, size_t *n, int fd);
 /* 2_parser.c */
 void init_info(cmd_data *parsed_commands);
 void parse_cmd(char *user_input, cmd_info *cmd);
@@ -87,7 +87,7 @@ char *get_full_path(cmd_info *cmd);
 char *_strtok(char *str, const char *sep, char **end);
 void strip_white_spaces(char **args_arr, int numb_args);
 int is_all_spaces(const char *line);
-cmd_info *(*is_builtin_command(cmd_info *command))(cmd_info *);
+builtin_function is_builtin_command(cmd_info *command);
 /* 4_builtin_functions.c */
 cmd_info *execute_exit(cmd_info *command);
 cmd_info *execute_env(cmd_info *command);
@@ -100,20 +100,13 @@ void invalid_exit_arg(char *arg);
 /* string_functions.c */
 char *_strdup(char *str);
 int _strlen(char *str);
-void _strcat(char *dest, char *src);
+void _strcat(char *s1, char *s2);
 char *_strchr(const char *s, const char c);
 int _atoi(const char *str);
-/* string_functions2.c */
-int _strcmp(char *str1, char *str2);
+/* more_string_functions.c */
 char *_strcpy(char *destination, const char *source);
+int _strcmp(char *str1, char *str2);
 int compare(const char *main_str, const char *search_str);
 const char *_strstr(const char *main_str, const char *search_str);
-
-/* additional_functions.c */
-void *_realloc(void *old_ad, size_t old_size, size_t new_size);
-int _getline(char **lineptr, size_t *n, FILE *stream);
-
-
-
 
 #endif /* SHELL_H */

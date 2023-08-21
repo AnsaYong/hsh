@@ -6,12 +6,11 @@
  *
  * Return: pointer to the new array
  */
-
 char *_strdup(char *str)
 {
 	int str_len = 0;
 	int i;
-	char *dup;
+	char *str_dup;
 
 	if (str == NULL)
 		return (NULL);
@@ -19,17 +18,16 @@ char *_strdup(char *str)
 	while (str[str_len] != '\0')
 		str_len++;
 
-	dup = (char *)malloc(sizeof(char) * (str_len + 1));
-
-	if (dup == NULL)
+	str_dup = malloc(sizeof(char) * (str_len + 1));
+	if (str_dup == NULL)
 		return (NULL);
 
 	for (i = 0; i < str_len; i++)
-		dup[i] = str[i];
+		str_dup[i] = str[i];
 
-	dup[str_len] = '\0';
+	str_dup[str_len] = '\0';
 
-	return (dup);
+	return (str_dup);
 }
 
 /**
@@ -56,42 +54,38 @@ int _strlen(char *str)
 
 /**
  * _strcat - concatenate two strings
- * @dest: destination string/address
- * @src: source string/address
- *
- * Return: Nothing
+ * @s1: destination string/address
+ * @s2: source string/address
  */
-
-void _strcat(char *dest, char *src)
+void _strcat(char *s1, char *s2)
 {
-	size_t dest_len, src_len, i;
+	size_t s1_len, s2_len, i;
 
-	dest_len = _strlen(dest);
-	src_len = _strlen(src);
+	s1_len = _strlen(s1);
+	s2_len = _strlen(s2);
 
-	for (i = 0; i < src_len; i++)
+	for (i = 0; i < s2_len; i++)
 	{
-		dest[dest_len + i] = src[i];
+		s1[s1_len + i] = s2[i];
 	}
 
-	dest[dest_len + i] = '\0';
+	s1[s1_len + i] = '\0';
 }
 
 /**
- * _strchr - Search a given substring in a main string
- * @s: Main string
- * @c: The substring to search
+ * _strchr - search a given substring in a main string
+ * @s: main string
+ * @c: substring to search
  *
- * Return: Pointer to the searched substring
-*/
-
+ * Return: pointer to the searched substring
+ */
 char *_strchr(const char *s, const char c)
 {
 	while (*s != '\0')
 	{
-	if (*s == c)
-		return ((char *)s);
-	s++;
+		if (*s == c)
+			return ((char *)s);
+		s++;
 	}
 
 	if (*s == c)
@@ -105,8 +99,7 @@ char *_strchr(const char *s, const char c)
  * @str: Main string
  *
  * Return: long integers
-*/
-
+ */
 int _atoi(const char *str)
 {
 	int i = 0, num = 0;

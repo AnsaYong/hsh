@@ -3,6 +3,7 @@
 /**
  * execute_command - executes a single not-built-in command using execve
  * @command: command struct
+ * @c_status: command status
  *
  * Return: -1 on success, 0 otherwise
  */
@@ -15,32 +16,26 @@ int execute_command(cmd_info *command, int *c_status)
 	child_pid = fork();
 	if (child_pid == -1)
 	{
-		printf("pid is -1");
 		perror("./hsh");
 	}
 	else if	(child_pid == 0)
 	{
-		printf("pid is 0 - so executing\n");
 		/* remember to add the environment parameter */
 		err_check = execve(command->cmd_name, command->args, NULL);
-		printf("The error code is: %d\n", err_check);
 		if (err_check < 0)
 		{
-			printf("execve returns a negative number\n");
 			perror("./hsh");
 		}
 		exit(EXIT_FAILURE);
 	}
 	else
 	{
-		printf("waiting for child process to terminate\n");
 		/* wait for the child to terminate */
 		wait(&status);
 
 		if (WIFEXITED(status))
 		{
 			cmd_status = WEXITSTATUS(status);
-			printf("cmd_status: %d\n", cmd_status);
 			*c_status = cmd_status;
 		}
 	}
@@ -55,13 +50,12 @@ int execute_command(cmd_info *command, int *c_status)
  */
 int is_fullpath(char *cmd)
 {
-	/* check of the first word starts with a '/' or '.' */
+	/* check of the first word starts with a '/' */
 	if ((cmd[0] == '/') | (cmd[0] == '.'))
 	{
-		printf("The first char is / or .\n");
 		return (1);
 	}
-	printf("Returning 0\n");
+
 	return (0);
 }
 

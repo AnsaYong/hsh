@@ -36,7 +36,8 @@ char *_strtok(char *str, const char *sep, char **end)
 /**
  * strip_white_spaces - remove all white from the front, middle and end of a
  * command, only leaving single spaces between words
- * @str: string containing user command
+ * @args_arr: pointer to array of user arguments
+ * @numb_args: number of arguments
  */
 void strip_white_spaces(char **args_arr, int numb_args)
 {
@@ -101,9 +102,9 @@ int is_all_spaces(const char *line)
  * is_builtin_command - checks if the command is a built-in command
  * @command: command struct
  *
- * Return: 1 if command is built-in, 0 if it is not built-in
+ * Return: funtion pointer if command is built-in, NULL otherwise
  */
-cmd_info *(*is_builtin_command(cmd_info *command))(cmd_info *)
+builtin_function is_builtin_command(cmd_info *command)
 {
 	builtin_cmd builtins[] = {
 		{"exit", execute_exit},

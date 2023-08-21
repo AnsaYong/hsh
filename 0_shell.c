@@ -20,13 +20,11 @@ int main(int argc, char *argv[], char *envp[])
 	if (!isatty(STDIN_FILENO))
 	{
 		/* source of input is anything other than the keyboard */
-		printf("Non-interactive mode\n");
 		non_interactive_mode(prog);
 	}
 
 	else
 	{
-		printf("Interactive mode\n");
 		interactive_mode(prog);
 	}
 
@@ -40,56 +38,33 @@ int main(int argc, char *argv[], char *envp[])
 void interactive_mode(char *prog)
 {
 	char *cmd_line;
-	int status = -1, i, cmd_status;
+	int status = -1;
 	cmd_data *commands;
-	/*builtin_function builtin_ptr = NULL;*/
 
-	(void)prog;
-
-	/* print prompt */
 	while (status == -1)
 	{
-		builtin_function builtin_ptr = NULL;
+		/* print prompt */
 		write(STDOUT_FILENO, "$ ", 2);
 		fflush(stdout);
 
 		/* read and store user commands from stdin */
 		cmd_line = read_cmd_line();
-		printf("You entered the following command: %s\n", cmd_line);
+		if (cmd_line != NULL && is_all_spaces(cmd_line))
+		{
+			free(cmd_line);
+			continue;
+		}
 
 		/* break up commands and arguments into separate words */
 		commands = parse_input(cmd_line);
-		free(cmd_line);
 
-		/* execute commands stored in cmd_info **cmds from cmd_data */
-		for (i = 0; i < commands->numb_cmds; i++)
-		{
-			if((builtin_ptr = is_builtin_command(commands->cmds[i])) != NULL)
-				builtin_ptr(commands->cmds[i]);
-			else
-			{
-				printf("The function is not a builtin function\n");
-				if (!(is_fullpath(commands->cmds[i]->cmd_name)))
-				{
-					printf("The command does not have a fullpath\n");
-					get_full_path(commands->cmds[i]);
-					printf("The updated command is %s\n", commands->cmds[i]->cmd_name);
-					print_cmd_info(commands);
-					status = execute_command(commands->cmds[i], &cmd_status);
-				}
-				else
-				{
-					status = execute_command(commands->cmds[i], &cmd_status);
-				}
-			}
-		}
+		/* process tokenized commands */
+		status = process_commands(commands, prog);
+
+		/* free memory */
 		free_cmd_info(commands);
 		free(cmd_line);
 	}
-
-	/* free memory */
-	/*free_cmd_info(commands);*/
-	/*free(cmd_line);*/
 
 	/* exit with status */
 	if (status >= 0)
@@ -99,80 +74,82 @@ void interactive_mode(char *prog)
 }
 
 /**
- * non-interactive_mode - executes commands in non interactive mode
+ * non_interactive_mode - executes commands in non interactive mode
  * @prog: a string representing the program name
  */
 void non_interactive_mode(char *prog)
 {
-	char *cmd_line, *fullpath = NULL;
-	int status = -1, i, cmd_status = 0;
+	char *cmd_line;
+	int status = -1;
 	cmd_data *commands;
-	builtin_function builtin_ptr = NULL;
 
 	while (status == -1)
 	{
-		cmd_line = read_cmd_line();	/* get user command from stdin */
+		/* get user command from stdin */
+		cmd_line = read_cmd_line();
+		printf("The command is: %s\n", cmd_line);
 		if (cmd_line != NULL && is_all_spaces(cmd_line))
 		{
 			free(cmd_line);
 			continue;
 		}
 
-		printf("You entered the following command: %s\n", cmd_line);
-		commands = parse_input(cmd_line); /* breakup cmd_line into cmds+args */
-		print_cmd_info(commands);
+		/* breakup cmd_line into command + arguments */
+		commands = parse_input(cmd_line);
 
-		/* execute all commands stored in cmd_info **cmds from cmd_data */
-		for (i = 0; i < commands->numb_cmds; i++)
-		{
-			printf("The current command is %s\n", commands->cmds[i]->cmd_name);
-			if((builtin_ptr = is_builtin_command(commands->cmds[i])) != NULL)
-			{
-				printf("Executing builtin command\n");
-				builtin_ptr(commands->cmds[i]);	/* use (*builtin_ptr)(...) */
-			}
-			else
-			{
-				printf("Not a builtin command\n");
-				printf("Checking the command for fullpath\n");
-				if (!(is_fullpath(commands->cmds[i]->cmd_name)))
-				{
-					printf("Command is %s and does not have full path\n", commands->cmds[i]->cmd_name);
-					fullpath = get_full_path(commands->cmds[i]);
-					if (fullpath == NULL)
-					{
-						command_not_found(prog, commands->cmds[i]->cmd_name);
-						free_cmd_info(commands);
-						free(cmd_line);
-						exit(127);
-					}
+		/* process tokenized commands */
+		status = process_commands(commands, prog);
 
-					/* free, then update old cmd_name ptr with new full path */
-					free(commands->cmds[i]->cmd_name);
-					commands->cmds[i]->cmd_name = fullpath;
-
-					/* free, then update first argument in args array */
-					free(commands->cmds[i]->args[0]);
-					commands->cmds[i]->args[0] = _strdup(fullpath);
-
-					printf("The updated command is:\n");
-					print_cmd_info(commands);
-					status = execute_command(commands->cmds[i], &cmd_status);
-				}
-				else
-				{
-					printf("Command is %s and full path is given\n", commands->cmds[i]->cmd_name);
-					status = execute_command(commands->cmds[i], &cmd_status);
-					printf("The command status is %d\n", cmd_status);
-					if (cmd_status)
-						exit(cmd_status);
-				}
-			}
-		}
+		/* free memory used for both user command and for tokenizing */
 		free_cmd_info(commands);
 		free(cmd_line);
 	}
 
 	if (status >= 0)
 		exit(status);
+}
+
+/**
+ * process_commands - processes each command in the cmd_data struct
+ * @commands: cmd_data struct containing all the commands
+ * @prog: program name
+ *
+ * Return: status of execution
+ */
+int process_commands(cmd_data *commands, char *prog)
+{
+	int i, status, cmd_status;
+	char *fullpath;
+	builtin_function builtin_ptr = NULL;
+
+	for (i = 0; i < commands->numb_cmds; i++) /* execute all commandds */
+	{
+		builtin_ptr = is_builtin_command(commands->cmds[i]);
+		if (builtin_ptr != NULL)
+		{
+			builtin_ptr(commands->cmds[i]); /* use (*builtin_ptr)(...) */
+			return (-1);
+		}
+		else	/* not builtin command */
+		{
+			if (!(is_fullpath(commands->cmds[i]->cmd_name)))	/* fullpath not given */
+			{
+				fullpath = get_full_path(commands->cmds[i]);
+				if (fullpath == NULL)
+				{
+					command_not_found(prog, commands->cmds[i]->cmd_name);
+					return (127);
+				}
+				free(commands->cmds[i]->cmd_name);	/* clear old cmd_name */
+				commands->cmds[i]->cmd_name = fullpath;	/* replace */
+				free(commands->cmds[i]->args[0]);	/* clear old cmd_name */
+				commands->cmds[i]->args[0] = strdup(fullpath); /* replace */
+
+				status = execute_command(commands->cmds[i], &cmd_status);
+			}
+			else
+				status = execute_command(commands->cmds[i], &cmd_status);
+		}
+	}
+	return (status);
 }

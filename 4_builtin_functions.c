@@ -4,7 +4,7 @@
  * execute_exit - executes exit command
  * @command: command struct
  *
- * Return: Nothing on success, NULL on failure
+ * Return: Nothing or command
  */
 cmd_info *execute_exit(cmd_info *command)
 {
@@ -31,14 +31,14 @@ cmd_info *execute_exit(cmd_info *command)
 		write(STDOUT_FILENO, "exit: too many arguments", 25);
 		write(STDOUT_FILENO, "\n", 1);
 	}
-	return (NULL);
+	return (command);
 }
 
 /**
  * execute_env - executes env command
  * @command: command struct
  *
- * Return: Nothing on success, NULL on failure
+ * Return: Nothing or command
  */
 cmd_info *execute_env(cmd_info *command)
 {
@@ -53,20 +53,19 @@ cmd_info *execute_env(cmd_info *command)
 		write(STDOUT_FILENO, "\n", 1);
 		env++;
 	}
-	return (NULL);
+	return (command);
 }
 
 /**
  * execute_cd - executes cd command
  * @command: command struct
  *
- * Return: Nothing on success, NULL on failure
+ * Return: Nothing or command
  */
 cmd_info *execute_cd(cmd_info *command)
 {
 	if (command->numb_args == 2)
 	{
-		printf("The argument (folder name) is %s\n", command->args[1]);
 		if (chdir(command->args[1]) == -1)
 		{
 			perror("cd");
@@ -77,14 +76,14 @@ cmd_info *execute_cd(cmd_info *command)
 		write(STDOUT_FILENO, "cd: invalid arguments", 21);
 		write(STDOUT_FILENO, "\n", 1);
 	}
-	return (NULL);
+	return (command);
 }
 
 /**
  * execute_setenv - executes setenv
  * @command: command struct
  *
- * Return: Nothing on success, NULL on failure
+ * Return: Nothing or command
  */
 cmd_info *execute_setenv(cmd_info *command)
 {
@@ -97,16 +96,16 @@ cmd_info *execute_setenv(cmd_info *command)
 	}
 	else
 	{
-		printf("setenv: invalid arguments\n");
+		perror("setenv");
 	}
-	return (NULL);
+	return (command);
 }
 
 /**
  * execute_unsetenv - executes unsetenv
  * @command: command struct
  *
- * Return: Nothing on success, NULL on failure
+ * Return: Nothing or command
  */
 cmd_info *execute_unsetenv(cmd_info *command)
 {
@@ -119,7 +118,7 @@ cmd_info *execute_unsetenv(cmd_info *command)
 	}
 	else
 	{
-		printf("unsetenv: invalid arguments\n");
+		perror("unsetenv");
 	}
-	return (NULL);
+	return (command);
 }

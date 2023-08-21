@@ -13,7 +13,7 @@ char *read_cmd_line(void)
 	ssize_t chars_read;
 
 	chars_read = getline(&buffer, &buffer_size, stdin);
-	/* chars_read = _getline(&buffer);*/
+	/* chars_read = _getline(&buffer, &buffer_size, STDIN_FILENO);*/
 
 	if (chars_read == -1)
 	{
@@ -35,50 +35,51 @@ char *read_cmd_line(void)
 
 /**
  * _getline - reads user input
- * @buffer: stores the user's input
+ * @lineptr: stores the user's input
+ * @n: buffer size
+ * @fd: file descriptor to read data from
  *
  * Return: number of characters read
  */
-ssize_t __getline(char **buffer)
+
+ssize_t _getline(char **lineptr, size_t *n, int fd)
 {
-	static char func_buff[MAX_CHARS];
-	size_t pos = 0, chars_read = 0, cmd_size = 0, buff_size = 0;
-	char current_char;
-	int line_complete = 0;
-	*buffer = NULL;
+	int ch;
+	size_t pos = 0, capacity = *n;
+	char *new_lineptr;
 
-	while (!line_complete)
+	if (lineptr == NULL || n == NULL || fd < 0)
+		return (-1);  /* Invalid arguments */
+
+	/* Allocate initial memory for the line */
+	if (*lineptr == NULL)
 	{
-		if (pos >= chars_read)  /* check if more data needs to be read */
-		{
-			chars_read = read(STDIN_FILENO, func_buff, MAX_CHARS);
-			if (chars_read <= 0)    /* end of input or an error occurred */
-			{
-				if (cmd_size == 0)      /* No characters read, return chars_read */
-					return (chars_read);
-				line_complete = 1;      /* Partial line read, indicate completion */
-			}
-
-			pos = 0;
-		}
-		current_char = func_buff[pos++];
-
-		if (cmd_size >= buff_size)      /* check if buffer needs to be resized */
-		{
-			buff_size = (buff_size == 0) ? MAX_CHARS : buff_size * 2;
-			*buffer = malloc(buff_size);
-			if (*buffer == NULL)
-			{
-				perror("Memory allocation failed");
-				exit(EXIT_FAILURE);
-			}
-		}
-		(*buffer)[cmd_size++] = current_char;   /* Append the current char */
-		if (current_char == '\0')       /* check if we reached end of the string */
-		{
-			line_complete = 1;
-			(*buffer)[cmd_size - 1] = '\0';
-		}
+		*lineptr = malloc(capacity);
+		if (*lineptr == NULL)
+			return (-1);  /* Memory allocation error */
 	}
-	return (cmd_size - 1);  /* Exclude the null-terminator */
+
+	while (read(fd, &ch, 1) == 1)
+	{
+		if (pos + 1 >= capacity)
+		{
+			capacity *= 2;
+			new_lineptr = realloc(*lineptr, capacity);
+			if (new_lineptr == NULL)
+			{
+				free(*lineptr);
+				return (-1);  /* Memory allocation error */
+			}
+			*lineptr = new_lineptr;
+			*n = capacity;
+		}
+		(*lineptr)[pos++] = ch;
+		if (ch == '\n')
+			break;
+	}
+	if (pos == 0)
+		return (-1);  /* No characters read */
+	(*lineptr)[pos] = '\0';  /* Null-terminate the string */
+
+	return (pos);  /* Return the number of characters read */
 }
